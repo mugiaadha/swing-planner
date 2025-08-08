@@ -1,41 +1,69 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>DCA 90-Day Stock Plan — Simulator</title>
+    <title>Trader Plan Generator — DCA / Cicil Multi-Saham</title>
     <style>
+      :root {
+        --bg: #f6f8fb;
+        --card: #fff;
+        --muted: #6b7280;
+        --accent: #2563eb;
+      }
       body {
-        font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto,
-          "Helvetica Neue", Arial;
-        padding: 20px;
-        background: #f6f8fb;
+        font-family: Inter, ui-sans-serif, system-ui, Segoe UI, Roboto,
+          Helvetica, Arial;
+        background: var(--bg);
+        margin: 0;
+        padding: 24px;
+        color: #0f172a;
+      }
+      .container {
+        max-width: 1100px;
+        margin: 0 auto;
       }
       h1 {
         font-size: 20px;
         margin: 0 0 12px;
       }
       .card {
-        background: #fff;
-        border-radius: 10px;
+        background: var(--card);
         padding: 16px;
-        box-shadow: 0 6px 18px rgba(23, 32, 54, 0.06);
-        margin-bottom: 12px;
+        border-radius: 12px;
+        box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+        margin-bottom: 14px;
       }
       label {
         display: block;
-        margin-top: 8px;
         font-size: 13px;
-        color: #333;
+        color: var(--muted);
+        margin-bottom: 6px;
       }
-      input[type="number"],
       input[type="text"],
+      input[type="number"],
       select {
         padding: 8px;
-        border-radius: 6px;
-        border: 1px solid #e0e6ef;
+        border: 1px solid #e6eef7;
+        border-radius: 8px;
         width: 100%;
         box-sizing: border-box;
+      }
+      .row {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 10px;
+      }
+      .col {
+        flex: 1;
+      }
+      button.btn {
+        background: var(--accent);
+        color: #fff;
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
       }
       table {
         width: 100%;
@@ -45,352 +73,662 @@
       th,
       td {
         padding: 8px;
+        border-bottom: 1px solid #eef2f7;
         text-align: left;
-        border-bottom: 1px solid #eee;
         font-size: 13px;
       }
       th {
-        background: #fbfcff;
+        background: #fbfdff;
       }
       .small {
         font-size: 12px;
-        color: #666;
+        color: var(--muted);
       }
-      .row {
+      .muted {
+        color: var(--muted);
+      }
+      .flex {
         display: flex;
-        gap: 12px;
+        gap: 8px;
+        align-items: center;
       }
-      .col {
-        flex: 1;
+      .chip {
+        background: #eef2ff;
+        padding: 6px 8px;
+        border-radius: 999px;
+        font-size: 12px;
+        color: var(--accent);
       }
       .right {
         text-align: right;
       }
-      .muted {
-        color: #7b8898;
+      .num {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
       }
-      .btn {
-        background: #2c3e50;
-        color: #fff;
-        padding: 8px 12px;
-        border-radius: 8px;
-        border: none;
-        cursor: pointer;
+      .controls {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
       }
-      .btn:active {
-        transform: translateY(1px);
-      }
-      .green {
-        color: green;
-      }
-      .red {
-        color: #c0392b;
-      }
-      .input-inline {
+      .stock-row {
         display: flex;
         gap: 8px;
+        margin-bottom: 8px;
+        align-items: center;
       }
-      .input-inline input {
-        flex: 1;
+      .stock-row input {
+        width: 120px;
       }
-      .note {
-        font-size: 13px;
-        color: #506075;
-        margin-top: 8px;
+      .danger {
+        background: #fee2e2;
+        color: #b91c1c;
+        border-radius: 8px;
+        padding: 6px 8px;
+        border: none;
+      }
+      .success {
+        background: #ecfccb;
+        color: #365314;
+        border-radius: 8px;
+        padding: 6px 8px;
+        border: none;
+      }
+      footer.small {
+        color: var(--muted);
+        margin-top: 12px;
+        font-size: 12px;
       }
     </style>
   </head>
   <body>
-    <h1>DCA 90-Day Stock Plan — Simulator</h1>
-    <div class="card">
-      <div class="row">
-        <div class="col">
-          <label>Total modal (Rp)</label>
-          <input id="modal" type="number" value="60000000" />
-        </div>
-        <div class="col">
-          <label>Lot size (lembar per lot)</label>
-          <input id="lotSize" type="number" value="100" />
-        </div>
-        <div class="col">
-          <label>Tahap (days)</label>
-          <input id="days" type="text" value="90 (3 tahap)" disabled />
-        </div>
-      </div>
-      <p class="note">
-        Tahap 1: beli 1 lot per saham (tes). Tahap 2: buy on weakness (default
-        alokasi 20% modal tersisa). Tahap 3: buy on momentum (default alokasi
-        40% modal awal).
-      </p>
-    </div>
+    <div class="container">
+      <h1>Trader Plan Generator (HTML/CSS/JS)</h1>
 
-    <div class="card">
-      <h3>Input Harga Saham</h3>
-      <div class="row">
-        <div class="col">
-          <label>CDIA (Rp)</label>
-          <input id="price_cdia" type="number" value="1575" />
-        </div>
-        <div class="col">
-          <label>BREN (Rp)</label>
-          <input id="price_bren" type="number" value="8000" />
-        </div>
-        <div class="col">
-          <label>PTRO (Rp)</label>
-          <input id="price_ptro" type="number" value="3710" />
-        </div>
-        <div class="col">
-          <label>CUAN (Rp)</label>
-          <input id="price_cuan" type="number" value="1575" />
-        </div>
-      </div>
-
-      <div style="margin-top: 12px" class="row">
-        <div class="col">
-          <label>Stage2 drop threshold (%)</label>
-          <input id="stage2_drop" type="number" value="5" />
-        </div>
-        <div class="col">
-          <label>Stage2 allocation of remaining modal (%)</label>
-          <input id="stage2_alloc_pct" type="number" value="20" />
-        </div>
-        <div class="col">
-          <label>Stage3 allocation of initial modal (%)</label>
-          <input id="stage3_alloc_pct" type="number" value="40" />
-        </div>
-        <div class="col">
-          <label>Stage3 select (momentum)</label>
-          <div style="display: flex; gap: 8px; margin-top: 6px">
-            <label
-              ><input type="checkbox" class="stage3_sel" value="cdia" checked />
-              CDIA</label
-            >
-            <label
-              ><input type="checkbox" class="stage3_sel" value="bren" checked />
-              BREN</label
-            >
-            <label
-              ><input type="checkbox" class="stage3_sel" value="ptro" checked />
-              PTRO</label
-            >
-            <label
-              ><input type="checkbox" class="stage3_sel" value="cuan" checked />
-              CUAN</label
-            >
+      <div class="card">
+        <div class="row">
+          <div class="col">
+            <label>Total modal (Rp)</label>
+            <input id="inputModal" type="number" value="60000000" />
+          </div>
+          <div class="col">
+            <label>Lot size (lembar per lot)</label>
+            <input id="inputLotSize" type="number" value="100" />
+          </div>
+          <div class="col">
+            <label>Durasi (hari)</label>
+            <input id="inputDays" type="number" value="90" />
+          </div>
+          <div class="col">
+            <label>Jumlah tahap</label>
+            <input id="inputStages" type="number" value="3" min="1" />
           </div>
         </div>
-      </div>
 
-      <div style="margin-top: 12px" class="row">
-        <div class="col">
-          <button class="btn" id="simulate">Simulasikan (Auto)</button>
-        </div>
-        <div class="col right">
-          <div class="small muted">
-            Update input akan otomatis menghitung jika tombol
-            <b>Simulasikan</b> ditekan.
+        <div
+          style="display: flex; gap: 12px; align-items: center; margin-top: 8px"
+        >
+          <div style="flex: 1">
+            <label>Alokasi tahap (pilih)</label>
+            <select id="allocMode">
+              <option value="equal">
+                Equal per tahap (sisa dibagi sama rata)
+              </option>
+              <option value="custom">Custom persen per tahap</option>
+            </select>
+          </div>
+          <div id="customAllocWrap" style="flex: 2; display: none">
+            <label
+              >Masukkan persen tiap tahap (pisahkan pakai koma). Contoh (3
+              tahap): 20,30,50</label
+            >
+            <input id="customAlloc" type="text" placeholder="misal: 20,30,50" />
+          </div>
+          <div style="width: 220px">
+            <label>Stage0 (fix) per saham (lot)</label>
+            <input id="stage0_lot" type="number" value="1" min="0" />
+          </div>
+          <div style="width: 220px">
+            <label>Simpan plan di browser selama...</label>
+            <select id="saveDays">
+              <option value="0">Jangan simpan</option>
+              <option value="1">1 hari</option>
+              <option value="3">3 hari</option>
+              <option value="7" selected>7 hari</option>
+              <option value="30">30 hari</option>
+            </select>
           </div>
         </div>
+        <p class="small">
+          Tahap 0 = pembelian awal (fix lots per saham). Tahap 1..N =
+          cicilan/entry selanjutnya. Jika gunakan custom allocation, jumlah
+          persentase harus = 100.
+        </p>
       </div>
-    </div>
 
-    <div class="card" id="results">
-      <h3>Hasil Simulasi</h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Saham</th>
-            <th>Harga</th>
-            <th>Stage1 (1 lot)</th>
-            <th>Stage2 target price</th>
-            <th>Stage2 lots</th>
-            <th>Stage3 lots</th>
-            <th>Total lots</th>
-            <th>Avg Price (Rp)</th>
-            <th>Invested (Rp)</th>
-          </tr>
-        </thead>
-        <tbody id="tbody"></tbody>
-      </table>
+      <div class="card">
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+          "
+        >
+          <div>
+            <strong>Daftar Saham</strong>
+            <div class="small muted">
+              Tambah, edit harga, dan bobot jika perlu.
+            </div>
+          </div>
+          <div class="flex">
+            <button class="btn" id="btnAddStock">+ Tambah Saham</button>
+            <button id="btnReset" class="danger">Reset</button>
+          </div>
+        </div>
 
-      <table style="margin-top: 12px">
-        <tr>
-          <th>Total modal awal</th>
-          <td id="r_modal"></td>
-        </tr>
-        <tr>
-          <th>Modal terpakai Stage1</th>
-          <td id="r_stage1"></td>
-        </tr>
-        <tr>
-          <th>Modal tersisa</th>
-          <td id="r_remain"></td>
-        </tr>
-        <tr>
-          <th>Alokasi Stage2 (Rp)</th>
-          <td id="r_stage2alloc"></td>
-        </tr>
-        <tr>
-          <th>Modal terpakai Stage2</th>
-          <td id="r_stage2used"></td>
-        </tr>
-        <tr>
-          <th>Alokasi Stage3 (Rp)</th>
-          <td id="r_stage3alloc"></td>
-        </tr>
-        <tr>
-          <th>Modal terpakai Stage3</th>
-          <td id="r_stage3used"></td>
-        </tr>
-        <tr>
-          <th>Modal akhir tersisa</th>
-          <td id="r_final"></td>
-        </tr>
-      </table>
+        <div id="stocksList"></div>
+
+        <template id="stockTemplate">
+          <div
+            class="stock-row card"
+            style="padding: 10px; align-items: center"
+          >
+            <input
+              class="s-name"
+              type="text"
+              placeholder="Kode (mis: CDIA)"
+              value="CDIA"
+            />
+            <input
+              class="s-price"
+              type="number"
+              placeholder="Harga per lembar"
+              value="1575"
+            />
+            <input
+              class="s-weight"
+              type="number"
+              placeholder="Bobot %"
+              value="0"
+            />
+            <div class="small muted">Bobot 0 = equal by price</div>
+            <button class="btn remove">Hapus</button>
+          </div>
+        </template>
+      </div>
+
+      <div class="card">
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          "
+        >
+          <div>
+            <strong>Hasil Rencana Trader</strong>
+            <div class="small muted">Hitung berdasarkan input di atas.</div>
+          </div>
+          <div class="flex">
+            <button class="btn" id="btnCompute">Generate Plan</button>
+            <button id="btnExport" class="success">Export CSV</button>
+          </div>
+        </div>
+
+        <div id="resultWrap" style="margin-top: 12px"></div>
+      </div>
+
+      <footer class="small">
+        Tip: mulai dengan stage0 kecil (1 lot) untuk test, gunakan
+        buy-on-weakness di tahap berikutnya jika harga turun.
+      </footer>
     </div>
 
     <script>
-      function fmt(n) {
-        return n === null ? "-" : n.toLocaleString("id-ID");
+      /*
+  Trader Plan Generator
+  - dynamic stock list
+  - stage0 fixed lots per stock
+  - stages (1..N) allocations: equal or custom %
+  - weighting per stock optional (if all zero -> allocation by price proportion)
+  - outputs lots per stage (integer lots), invested per stage, avg price estimate
+  - export CSV
+*/
+
+      // helpers
+      const $ = (id) => document.getElementById(id);
+      const fmt = (v) =>
+        typeof v === "number" ? v.toLocaleString("id-ID") : v;
+
+      function createStockRow(name = "CDIA", price = 1575, weight = 0) {
+        const t = document
+          .getElementById("stockTemplate")
+          .content.cloneNode(true);
+        const el = t.querySelector(".stock-row");
+        el.querySelector(".s-name").value = name;
+        el.querySelector(".s-price").value = price;
+        el.querySelector(".s-weight").value = weight;
+        el.querySelector(".remove").addEventListener("click", () => {
+          el.remove();
+        });
+        document.getElementById("stocksList").appendChild(el);
       }
-      function calc() {
-        const modal = Number(document.getElementById("modal").value) || 0;
-        const lotSize = Number(document.getElementById("lotSize").value) || 100;
-        const p = {
-          cdia: Number(document.getElementById("price_cdia").value) || 0,
-          bren: Number(document.getElementById("price_bren").value) || 0,
-          ptro: Number(document.getElementById("price_ptro").value) || 0,
-          cuan: Number(document.getElementById("price_cuan").value) || 0,
-        };
-        const stage2_drop =
-          Number(document.getElementById("stage2_drop").value) || 5;
-        const stage2_alloc_pct =
-          Number(document.getElementById("stage2_alloc_pct").value) || 20;
-        const stage3_alloc_pct =
-          Number(document.getElementById("stage3_alloc_pct").value) || 40;
-        const sel = Array.from(
-          document.querySelectorAll(".stage3_sel:checked")
-        ).map((i) => i.value);
 
-        // Stage1: 1 lot each
-        const stage1 = {
-          cdia: { lots: 1, price: p.cdia },
-          bren: { lots: 1, price: p.bren },
-          ptro: { lots: 1, price: p.ptro },
-          cuan: { lots: 1, price: p.cuan },
-        };
-        function cost(lots, price) {
-          return lots * lotSize * price;
-        }
-        const cost_stage1 =
-          cost(stage1.cdia.lots, stage1.cdia.price) +
-          cost(stage1.bren.lots, stage1.bren.price) +
-          cost(stage1.ptro.lots, stage1.ptro.price) +
-          cost(stage1.cuan.lots, stage1.cuan.price);
+      document
+        .getElementById("btnAddStock")
+        .addEventListener("click", () => createStockRow("", "", 0));
+      document.getElementById("btnReset").addEventListener("click", () => {
+        if (!confirm("Reset semua input?")) return;
+        $("stocksList").innerHTML = "";
+        createStockRow("CDIA", 1575, 0);
+        createStockRow("BREN", 8000, 0);
+        createStockRow("PTRO", 3710, 0);
+        createStockRow("CUAN", 1575, 0);
+      });
 
-        const remain_after_s1 = modal - cost_stage1;
+      // initial
+      createStockRow("CDIA", 1575, 0);
+      createStockRow("BREN", 8000, 0);
+      createStockRow("PTRO", 3710, 0);
+      createStockRow("CUAN", 1575, 0);
 
-        // Stage2 allocation (of remaining modal)
-        const stage2_alloc = Math.floor(
-          remain_after_s1 * (stage2_alloc_pct / 100)
+      // toggle custom alloc
+      $("allocMode").addEventListener("change", (e) => {
+        $("customAllocWrap").style.display =
+          e.target.value === "custom" ? "block" : "none";
+      });
+
+      // get stocks array
+      function readStocks() {
+        const rows = Array.from(
+          document.querySelectorAll("#stocksList .stock-row")
         );
-        // divide equally among 4
-        const per_stock_stage2 = Math.floor(stage2_alloc / 4);
-
-        // for each stock compute target price
-        const target = {
-          cdia: p.cdia * (1 - stage2_drop / 100),
-          bren: p.bren * (1 - stage2_drop / 100),
-          ptro: p.ptro * (1 - stage2_drop / 100),
-          cuan: p.cuan * (1 - stage2_drop / 100),
-        };
-        // compute purchasable lots at target price using per_stock_stage2
-        const stage2 = {};
-        ["cdia", "bren", "ptro", "cuan"].forEach((k) => {
-          const lots = Math.floor(
-            per_stock_stage2 / (lotSize * Math.max(1, target[k]))
-          );
-          stage2[k] = { lots: lots, price: Math.max(1, Math.round(target[k])) };
-        });
-        const cost_stage2_actual =
-          stage2.cdia.lots * lotSize * stage2.cdia.price +
-          stage2.bren.lots * lotSize * stage2.bren.price +
-          stage2.ptro.lots * lotSize * stage2.ptro.price +
-          stage2.cuan.lots * lotSize * stage2.cuan.price;
-
-        // Stage3 allocation (of initial modal)
-        const stage3_alloc = Math.floor(modal * (stage3_alloc_pct / 100));
-        // split equally among selected
-        const selCount = Math.max(1, sel.length);
-        const per_sel = Math.floor(stage3_alloc / selCount);
-        const stage3 = {};
-        ["cdia", "bren", "ptro", "cuan"].forEach((k) => {
-          if (sel.includes(k)) {
-            const lots = Math.floor(per_sel / (lotSize * Math.max(1, p[k])));
-            stage3[k] = { lots: lots, price: Math.max(1, Math.round(p[k])) };
-          } else {
-            stage3[k] = { lots: 0, price: 0 };
-          }
-        });
-        const cost_stage3_actual =
-          stage3.cdia.lots * lotSize * stage3.cdia.price +
-          stage3.bren.lots * lotSize * stage3.bren.price +
-          stage3.ptro.lots * lotSize * stage3.ptro.price +
-          stage3.cuan.lots * lotSize * stage3.cuan.price;
-
-        const final_remain =
-          modal - cost_stage1 - cost_stage2_actual - cost_stage3_actual;
-
-        // build table rows
-        const tbody = document.getElementById("tbody");
-        tbody.innerHTML = "";
-        ["cdia", "bren", "ptro", "cuan"].forEach((k) => {
-          const s1lots = stage1[k].lots;
-          const s2lots = stage2[k].lots;
-          const s3lots = stage3[k].lots;
-          const totalLots = s1lots + s2lots + s3lots;
-          const invested =
-            cost(s1lots, p[k]) +
-            cost(s2lots, stage2[k].price) +
-            cost(s3lots, stage3[k].price);
-          const avgPrice =
-            totalLots > 0 ? Math.round(invested / (totalLots * lotSize)) : 0;
-          const row = document.createElement("tr");
-          row.innerHTML = `
-            <td>${k.toUpperCase()}</td>
-            <td>${fmt(p[k])}</td>
-            <td>${s1lots} lot</td>
-            <td>${Math.round(target[k])}</td>
-            <td>${s2lots} lot</td>
-            <td>${s3lots} lot</td>
-            <td>${totalLots} lot</td>
-            <td>${avgPrice ? fmt(avgPrice) : "-"}</td>
-            <td>${fmt(invested)}</td>`;
-          tbody.appendChild(row);
-        });
-
-        document.getElementById("r_modal").innerText = fmt(modal);
-        document.getElementById("r_stage1").innerText = fmt(cost_stage1);
-        document.getElementById("r_remain").innerText = fmt(remain_after_s1);
-        document.getElementById("r_stage2alloc").innerText = fmt(stage2_alloc);
-        document.getElementById("r_stage2used").innerText =
-          fmt(cost_stage2_actual);
-        document.getElementById("r_stage3alloc").innerText = fmt(stage3_alloc);
-        document.getElementById("r_stage3used").innerText =
-          fmt(cost_stage3_actual);
-        document.getElementById("r_final").innerText = fmt(final_remain);
+        return rows
+          .map((r) => {
+            return {
+              name: r.querySelector(".s-name").value.trim() || "UNK",
+              price: Number(r.querySelector(".s-price").value) || 0,
+              weight: Number(r.querySelector(".s-weight").value) || 0,
+            };
+          })
+          .filter((s) => s.price > 0);
       }
 
-      document.getElementById("simulate").addEventListener("click", calc);
-      // auto-calc on input change after small debounce
-      let t;
-      document.querySelectorAll("input").forEach((i) =>
-        i.addEventListener("input", () => {
-          clearTimeout(t);
-          t = setTimeout(calc, 400);
-        })
-      );
-      window.addEventListener("load", calc);
+      // compute plan
+      function computePlan() {
+        const modal = Number($("inputModal").value) || 0;
+        const lotSize = Number($("inputLotSize").value) || 100;
+        const days = Number($("inputDays").value) || 90;
+        const stages = Math.max(1, Number($("inputStages").value) || 3);
+        const stage0Lots = Math.max(0, Number($("stage0_lot").value) || 1);
+        const allocMode = $("allocMode").value;
+        let customPercents = [];
+
+        if (allocMode === "custom") {
+          const raw = ($("customAlloc").value || "").trim();
+          if (!raw) {
+            alert("Masukkan persen custom untuk tiap tahap (jumlah = 100)");
+            return null;
+          }
+          customPercents = raw.split(",").map((x) => Number(x.trim()) || 0);
+          if (customPercents.length !== stages) {
+            alert(
+              "Jumlah persen custom harus sesuai jumlah tahap yang kamu pilih."
+            );
+            return null;
+          }
+          const sum = customPercents.reduce((a, b) => a + b, 0);
+          if (Math.round(sum) !== 100) {
+            alert(
+              "Total persen custom harus 100%. Saat ini total = " + sum + "%"
+            );
+            return null;
+          }
+        }
+
+        const stocks = readStocks();
+        if (stocks.length === 0) {
+          alert("Tambahkan minimal 1 saham dengan harga > 0");
+          return null;
+        }
+
+        // compute money reserved for stage0
+        let stage0Cost = 0;
+        stocks.forEach((s) => (stage0Cost += stage0Lots * lotSize * s.price));
+
+        if (stage0Cost > modal) {
+          alert(
+            "Modal tidak cukup untuk stage0. Kurangi stage0 lots atau tambah modal."
+          );
+          return null;
+        }
+
+        // remaining modal for stages 1..stages
+        let remaining = modal - stage0Cost;
+
+        // stage allocation in money
+        let stageAllocations = [];
+        if (allocMode === "equal") {
+          // equal share across stages
+          const per = Math.floor(remaining / stages);
+          // to avoid rounding losing money, build allocations that sum <= remaining
+          for (let i = 0; i < stages; i++) stageAllocations.push(per);
+          // add remainder to last stage
+          const rem = remaining - per * stages;
+          if (rem > 0) stageAllocations[stages - 1] += rem;
+        } else {
+          // custom percents -> convert to money
+          stageAllocations = customPercents.map((p) => {
+            return Math.floor((remaining * p) / 100);
+          });
+          // fix remainder
+          const allocated = stageAllocations.reduce((a, b) => a + b, 0);
+          const rem = remaining - allocated;
+          if (rem > 0) stageAllocations[stageAllocations.length - 1] += rem;
+        }
+
+        // decide per-stock allocation within each stage
+        // If user specified weights (some non-zero), we use normalized weights.
+        // Otherwise distribute by price-proportion (inverse?) — we'll use price-proportional so expensive stocks get more money proportionally.
+        let useWeights = stocks.some((s) => s.weight > 0);
+        let totalWeight = useWeights
+          ? stocks.reduce((a, b) => a + (b.weight || 0), 0)
+          : null;
+
+        // fallback: compute price-proportion (price / sum(price))
+        const totalPrice = stocks.reduce((a, b) => a + b.price, 0);
+
+        // For each stage, compute lots per stock (integer lots) using floor of (money * share) / (lotSize*price)
+        const plan = {}; // stockName -> details
+        stocks.forEach((s) => {
+          plan[s.name] = {
+            price: s.price,
+            stage0: stage0Lots,
+            stages: Array.from({ length: stages }, () => 0),
+            investedStage0: stage0Lots * lotSize * s.price,
+          };
+        });
+
+        // For each stage index
+        for (let si = 0; si < stages; si++) {
+          const moneyForStage = stageAllocations[si] || 0;
+          // allocate moneyForStage among stocks according to weights / price proportion
+          // compute each stock money share
+          let shares = stocks.map((s) => {
+            let share = 0;
+            if (useWeights) {
+              if (totalWeight === 0) share = 1 / stocks.length;
+              else share = s.weight / totalWeight;
+            } else {
+              share = s.price / totalPrice; // proportional to price
+            }
+            return share;
+          });
+
+          // now compute tentative lots
+          let stageLots = stocks.map((s, idx) => {
+            const allocatedMoney = Math.floor(moneyForStage * shares[idx]);
+            const lotCost = lotSize * s.price;
+            const lotsCanBuy = Math.floor(allocatedMoney / lotCost);
+            return lotsCanBuy;
+          });
+
+          // It's possible due to floors we didn't use all moneyForStage. Try greedy filling: distribute leftover money to stocks that can accept additional lot
+          let usedMoney = stageLots.reduce(
+            (acc, lots, idx) => acc + lots * lotSize * stocks[idx].price,
+            0
+          );
+          let leftover = moneyForStage - usedMoney;
+          // Greedy: while leftover can buy at least one lot of any stock, buy for cheapest lot first
+          while (true) {
+            // find cheapest lot cost among stocks where leftover >= lotCost
+            let buyIdx = -1;
+            let minCost = Infinity;
+            for (let i = 0; i < stocks.length; i++) {
+              const costLot = lotSize * stocks[i].price;
+              if (costLot <= leftover && costLot < minCost) {
+                minCost = costLot;
+                buyIdx = i;
+              }
+            }
+            if (buyIdx === -1) break;
+            stageLots[buyIdx] += 1;
+            leftover -= minCost;
+          }
+
+          // assign stageLots to plan and accumulate invested
+          stocks.forEach((s, idx) => {
+            plan[s.name].stages[si] = stageLots[idx];
+            plan[s.name].investedStage0 = plan[s.name].investedStage0 || 0;
+            // accumulate invested for stage via later calc
+          });
+        }
+
+        // finalize invested amounts & totals
+        let totals = {
+          investedStage0: 0,
+          investedStages: Array.from({ length: stages }, () => 0),
+          totalInvested: 0,
+        };
+
+        stocks.forEach((s, idx) => {
+          const entry = plan[s.name];
+          const invest0 = entry.stage0 * lotSize * s.price;
+          totals.investedStage0 += invest0;
+          let sumStages = 0;
+          entry.stages.forEach((lots, si) => {
+            const cost = lots * lotSize * s.price;
+            totals.investedStages[si] += cost;
+            sumStages += cost;
+          });
+          entry.totalLots =
+            entry.stage0 + entry.stages.reduce((a, b) => a + b, 0);
+          entry.totalInvested = invest0 + sumStages;
+          entry.avgPricePerShare =
+            entry.totalLots > 0
+              ? Math.round(entry.totalInvested / (entry.totalLots * lotSize))
+              : 0;
+          totals.totalInvested += entry.totalInvested;
+        });
+
+        const leftoverFinal = modal - totals.totalInvested;
+
+        return {
+          plan,
+          stocks,
+          totals,
+          stageAllocations,
+          leftoverFinal,
+          stages,
+          lotSize,
+          modal,
+        };
+      }
+
+      // render result
+      function renderResult(obj) {
+        const wrap = $("resultWrap");
+        if (!obj) {
+          wrap.innerHTML = "";
+          return;
+        }
+        const {
+          plan,
+          stocks,
+          totals,
+          stageAllocations,
+          leftoverFinal,
+          stages,
+          lotSize,
+          modal,
+        } = obj;
+
+        let html = `<div class="card"><div class="small muted">Modal awal: Rp ${fmt(
+          modal
+        )}</div>
+    <table><thead><tr><th>Saham</th><th>Harga</th><th>Stage0 (lot)</th>`;
+        for (let s = 0; s < stages; s++)
+          html += `<th>Stage ${s + 1} (lot)</th>`;
+        html += `<th>Total Lot</th><th>Avg Price/lembar</th><th>Total Invest (Rp)</th></tr></thead><tbody>`;
+
+        for (const s of stocks) {
+          const row = plan[s.name];
+          html += `<tr>
+      <td>${s.name}</td>
+      <td>Rp ${fmt(s.price)}</td>
+      <td>${row.stage0}</td>`;
+          for (let i = 0; i < stages; i++)
+            html += `<td>${row.stages[i] || 0}</td>`;
+          html += `<td>${row.totalLots}</td>
+      <td>Rp ${fmt(row.avgPricePerShare)}</td>
+      <td>Rp ${fmt(row.totalInvested)}</td>
+    </tr>`;
+        }
+
+        html += `</tbody></table>
+    <div style="margin-top:12px"><strong>Ringkasan:</strong>
+      <div class="small">Investasi Stage0: Rp ${fmt(
+        totals.investedStage0
+      )}</div>`;
+
+        stageAllocations.forEach((a, idx) => {
+          html += `<div class="small">Alokasi Stage ${idx + 1}: Rp ${fmt(
+            a
+          )} (terpakai: Rp ${fmt(totals.investedStages[idx] || 0)})</div>`;
+        });
+
+        html += `<div class="small">Total invested: Rp ${fmt(
+          totals.totalInvested
+        )}</div>
+           <div class="small">Sisa modal (final): Rp ${fmt(leftoverFinal)}</div>
+           </div>
+    </div>`;
+
+        wrap.innerHTML = html;
+      }
+
+      // CSV export
+      function exportCSV(obj) {
+        if (!obj) return;
+        const {
+          plan,
+          stocks,
+          totals,
+          stageAllocations,
+          leftoverFinal,
+          stages,
+          lotSize,
+        } = obj;
+        let rows = [];
+        let header = ["Saham", "Harga", "Stage0(lot)"];
+        for (let i = 0; i < stages; i++) header.push(`Stage${i + 1}(lot)`);
+        header.push("TotalLot", "AvgPricePerShare", "TotalInvested");
+        rows.push(header.join(","));
+
+        stocks.forEach((s) => {
+          const p = plan[s.name];
+          const row = [s.name, s.price, p.stage0];
+          for (let i = 0; i < stages; i++) row.push(p.stages[i] || 0);
+          row.push(p.totalLots, p.avgPricePerShare, p.totalInvested);
+          rows.push(row.join(","));
+        });
+
+        rows.push("");
+        rows.push(`Summary,Modal awal,${$("inputModal").value}`);
+        rows.push(`Invested Stage0,${totals.investedStage0}`);
+        stageAllocations.forEach((a, idx) =>
+          rows.push(
+            `Allocated Stage ${idx + 1},${a},Used ${
+              totals.investedStages[idx] || 0
+            }`
+          )
+        );
+        rows.push(`Total Invested,${totals.totalInvested}`);
+        rows.push(`Leftover,${leftoverFinal}`);
+
+        const csv = rows.join("\n");
+        const blob = new Blob([csv], { type: "text/csv" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "trader_plan.csv";
+        a.click();
+        URL.revokeObjectURL(url);
+      }
+
+      // event handlers
+      $("btnCompute").addEventListener("click", () => {
+        const res = computePlan();
+        if (res) {
+          renderResult(res);
+          // save to localStorage if needed
+          const saveDays = Number($("saveDays").value) || 0;
+          if (saveDays > 0) {
+            const data = {
+              modal: $("inputModal").value,
+              lotSize: $("inputLotSize").value,
+              days: $("inputDays").value,
+              stages: $("inputStages").value,
+              stage0: $("stage0_lot").value,
+              allocMode: $("allocMode").value,
+              customAlloc: $("customAlloc").value,
+              stocks: readStocks(),
+              ts: Date.now(),
+              exp: Date.now() + saveDays * 24 * 60 * 60 * 1000,
+            };
+            localStorage.setItem("traderPlan", JSON.stringify(data));
+          } else {
+            localStorage.removeItem("traderPlan");
+          }
+        }
+      });
+
+      $("btnExport").addEventListener("click", () => {
+        const res = computePlan();
+        if (res) exportCSV(res);
+      });
+
+      // allow pressing Enter in customAlloc
+      $("customAlloc").addEventListener("keydown", (e) => {
+        if (e.key === "Enter") $("btnCompute").click();
+      });
+
+      // on load, try to restore plan
+      window.addEventListener("DOMContentLoaded", () => {
+        const raw = localStorage.getItem("traderPlan");
+        if (raw) {
+          try {
+            const data = JSON.parse(raw);
+            if (data.exp && Date.now() < data.exp) {
+              $("inputModal").value = data.modal || 60000000;
+              $("inputLotSize").value = data.lotSize || 100;
+              $("inputDays").value = data.days || 90;
+              $("inputStages").value = data.stages || 3;
+              $("stage0_lot").value = data.stage0 || 1;
+              $("allocMode").value = data.allocMode || "equal";
+              $("customAlloc").value = data.customAlloc || "";
+              // restore stocks
+              $("stocksList").innerHTML = "";
+              (data.stocks || []).forEach((s) =>
+                createStockRow(s.name, s.price, s.weight)
+              );
+              // show/hide custom alloc
+              $("customAllocWrap").style.display =
+                data.allocMode === "custom" ? "block" : "none";
+              // set saveDays to match remaining days
+              const left = Math.ceil(
+                (data.exp - Date.now()) / (24 * 60 * 60 * 1000)
+              );
+              $("saveDays").value = left > 0 ? left : 7;
+              // auto-compute
+              const res = computePlan();
+              if (res) renderResult(res);
+            } else {
+              localStorage.removeItem("traderPlan");
+            }
+          } catch {}
+        }
+      });
     </script>
   </body>
 </html>
