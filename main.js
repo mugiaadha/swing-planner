@@ -15,41 +15,39 @@ function syncStageInputs() {
     pricesWrap.innerHTML = "";
     if (stages > 5) {
       for (let i = 0; i < stages; i++) {
-        const rowDiv = document.createElement("div");
-        rowDiv.style.display = "flex";
-        rowDiv.style.alignItems = "center";
-        rowDiv.style.marginBottom = "2px";
-        const label = document.createElement("span");
-        label.className = "stage-label";
-        label.textContent = `S${i + 1}: `;
-        rowDiv.appendChild(label);
+        const groupDiv = document.createElement("div");
+        groupDiv.className = "input-group";
+        groupDiv.style.marginBottom = "2px";
+        const addon = document.createElement("span");
+        addon.className = "input-group-text stage-label";
+        addon.textContent = `S${i + 1}`;
+        groupDiv.appendChild(addon);
         const inp = document.createElement("input");
         inp.type = "number";
-        inp.className = "s-stage-price";
+        inp.className = "form-control s-stage-price";
         inp.placeholder = `Harga S${i + 1}`;
-        inp.style.width = "70px";
-        inp.style.marginLeft = "2px";
         inp.value = oldValues[i] !== undefined ? oldValues[i] : "";
-        rowDiv.appendChild(inp);
-        pricesWrap.appendChild(rowDiv);
+        groupDiv.appendChild(inp);
+        pricesWrap.appendChild(groupDiv);
       }
     } else {
       for (let i = 0; i < stages; i++) {
-        const label = document.createElement("span");
-        label.className = "stage-label";
-        label.textContent = `S${i + 1}: `;
-        pricesWrap.appendChild(label);
+        const groupDiv = document.createElement("div");
+        groupDiv.className = "input-group";
+        groupDiv.style.display = "inline-flex";
+        groupDiv.style.width = "auto";
+        groupDiv.style.marginRight = "4px";
+        const addon = document.createElement("span");
+        addon.className = "input-group-text stage-label";
+        addon.textContent = `S${i + 1}`;
+        groupDiv.appendChild(addon);
         const inp = document.createElement("input");
         inp.type = "number";
-        inp.className = "s-stage-price";
+        inp.className = "form-control s-stage-price";
         inp.placeholder = `Harga S${i + 1}`;
-        inp.style.width = "70px";
-        inp.style.marginLeft = "2px";
         inp.value = oldValues[i] !== undefined ? oldValues[i] : "";
-        pricesWrap.appendChild(inp);
-        if (i < stages - 1) {
-          pricesWrap.appendChild(document.createTextNode(" "));
-        }
+        groupDiv.appendChild(inp);
+        pricesWrap.appendChild(groupDiv);
       }
     }
   });
@@ -71,41 +69,39 @@ function createStockRow(name = "CDIA", price = 1575, weight = 0, stagePrices = [
   pricesWrap.innerHTML = "";
   if (stages > 5) {
     for (let i = 0; i < stages; i++) {
-      const rowDiv = document.createElement("div");
-      rowDiv.style.display = "flex";
-      rowDiv.style.alignItems = "center";
-      rowDiv.style.marginBottom = "2px";
-      const label = document.createElement("span");
-      label.className = "stage-label";
-      label.textContent = `S${i + 1}: `;
-      rowDiv.appendChild(label);
+      const groupDiv = document.createElement("div");
+      groupDiv.className = "input-group";
+      groupDiv.style.marginBottom = "2px";
+      const addon = document.createElement("span");
+      addon.className = "input-group-text stage-label";
+      addon.textContent = `S${i + 1}`;
+      groupDiv.appendChild(addon);
       const inp = document.createElement("input");
       inp.type = "number";
-      inp.className = "s-stage-price";
+      inp.className = "form-control s-stage-price";
       inp.placeholder = `Harga S${i + 1}`;
-      inp.style.width = "70px";
-      inp.style.marginLeft = "2px";
       inp.value = stagePrices[i] !== undefined ? stagePrices[i] : "";
-      rowDiv.appendChild(inp);
-      pricesWrap.appendChild(rowDiv);
+      groupDiv.appendChild(inp);
+      pricesWrap.appendChild(groupDiv);
     }
   } else {
     for (let i = 0; i < stages; i++) {
-      const label = document.createElement("span");
-      label.className = "stage-label";
-      label.textContent = `S${i + 1}: `;
-      pricesWrap.appendChild(label);
+      const groupDiv = document.createElement("div");
+      groupDiv.className = "input-group";
+      groupDiv.style.display = "inline-flex";
+      groupDiv.style.width = "auto";
+      groupDiv.style.marginRight = "4px";
+      const addon = document.createElement("span");
+      addon.className = "input-group-text stage-label";
+      addon.textContent = `S${i + 1}`;
+      groupDiv.appendChild(addon);
       const inp = document.createElement("input");
       inp.type = "number";
-      inp.className = "s-stage-price";
+      inp.className = "form-control s-stage-price";
       inp.placeholder = `Harga S${i + 1}`;
-      inp.style.width = "70px";
-      inp.style.marginLeft = "2px";
       inp.value = stagePrices[i] !== undefined ? stagePrices[i] : "";
-      pricesWrap.appendChild(inp);
-      if (i < stages - 1) {
-        pricesWrap.appendChild(document.createTextNode(" "));
-      }
+      groupDiv.appendChild(inp);
+      pricesWrap.appendChild(groupDiv);
     }
   }
   el.querySelector(".remove").addEventListener("click", () => {
