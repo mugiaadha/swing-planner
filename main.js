@@ -379,7 +379,13 @@ $("btnCompute").addEventListener("click", () => {
   const res = computePlan();
   if (res) {
     renderResult(res);
-    const saveDays = Number($("saveDays").value) || 0;
+    let saveDaysVal = $("saveDays").value;
+    let saveDays = 0;
+    if (saveDaysVal === "durasi") {
+      saveDays = Number($("inputDays").value) || 0;
+    } else {
+      saveDays = Number(saveDaysVal) || 0;
+    }
     if (saveDays > 0) {
       const data = {
         modal: $("inputModal").value,
