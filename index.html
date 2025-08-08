@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>DCA 90-Day Stock Plan — Simulator</title>
+    <style>
+      body {
+        font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial;
+        padding: 20px;
+        background: #f6f8fb;
+      }
+      h1 {
+        font-size: 20px;
+        margin: 0 0 12px;
+      }
+      .card {
+        background: #fff;
+        border-radius: 10px;
+        padding: 16px;
+        box-shadow: 0 6px 18px rgba(23, 32, 54, 0.06);
+        margin-bottom: 12px;
+      }
+      label {
+        display: block;
+        margin-top: 8px;
+        font-size: 13px;
+        color: #333;
+      }
+      input[type="number"],
+      input[type="text"],
+      select {
+        padding: 8px;
+        border-radius: 6px;
+        border: 1px solid #e0e6ef;
+        width: 100%;
+        box-sizing: border-box;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 12px;
+      }
+      th,
+      td {
+        padding: 8px;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+        font-size: 13px;
+      }
+      th {
+        background: #fbfcff;
+      }
+      .small {
+        font-size: 12px;
+        color: #666;
+      }
+      .row {
+        display: flex;
+        gap: 12px;
+      }
+      .col {
+        flex: 1;
+      }
+      .right {
+        text-align: right;
+      }
+      .muted {
+        color: #7b8898;
+      }
+      .btn {
+        background: #2c3e50;
+        color: #fff;
+        padding: 8px 12px;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+      }
+      .btn:active {
+        transform: translateY(1px);
+      }
+      .green {
+        color: green;
+      }
+      .red {
+        color: #c0392b;
+      }
+      .input-inline {
+        display: flex;
+        gap: 8px;
+      }
+      .input-inline input {
+        flex: 1;
+      }
+      .note {
+        font-size: 13px;
+        color: #506075;
+        margin-top: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>DCA 90-Day Stock Plan — Simulator</h1>
+    <div class="card">
+      <div class="row">
+        <div class="col">
+          <label>Total modal (Rp)</label>
+          <input id="modal" type="number" value="60000000" />
+        </div>
+        <div class="col">
+          <label>Lot size (lembar per lot)</label>
+          <input id="lotSize" type="number" value="100" />
+        </div>
+        <div class="col">
+          <label>Tahap (days)</label>
+          <input id="days" type="text" value="90 (3 tahap)" disabled />
+        </div>
+      </div>
+      <p class="note">
+        Tahap 1: beli 1 lot per saham (tes). Tahap 2: buy on weakness (default
+        alokasi 20% modal tersisa). Tahap 3: buy on momentum (default alokasi
+        40% modal awal).
+      </p>
+    </div>
+
+    <div class="card">
+      <h3>Input Harga Saham</h3>
+      <div class="row">
+        <div class="col">
+          <label>CDIA (Rp)</label>
+          <input id="price_cdia" type="number" value="1575" />
+        </div>
+        <div class="col">
+          <label>BREN (Rp)</label>
+          <input id="price_bren" type="number" value="8000" />
+        </div>
+        <div class="col">
+          <label>PTRO (Rp)</label>
+          <input id="price_ptro" type="number" value="3710" />
+        </div>
+        <div class="col">
+          <label>CUAN (Rp)</label>
+          <input id="price_cuan" type="number" value="1575" />
+        </div>
+      </div>
+
+      <div style="margin-top: 12px" class="row">
+        <div class="col">
+          <label>Stage2 drop threshold (%)</label>
+          <input id="stage2_drop" type="number" value="5" />
+        </div>
+        <div class="col">
+          <label>Stage2 allocation of remaining modal (%)</label>
+          <input id="stage2_alloc_pct" type="number" value="20" />
+        </div>
+        <div class="col">
+          <label>Stage3 allocation of initial modal (%)</label>
+          <input id="stage3_alloc_pct" type="number" value="40" />
+        </div>
+        <div class="col">
+          <label>Stage3 select (momentum)</label>
+          <div style="display: flex; gap: 8px; margin-top: 6px">
+            <label
+              ><input type="checkbox" class="stage3_sel" value="cdia" checked />
+              CDIA</label
+            >
+            <label
+              ><input type="checkbox" class="stage3_sel" value="bren" checked />
+              BREN</label
+            >
+            <label
+              ><input type="checkbox" class="stage3_sel" value="ptro" checked />
+              PTRO</label
+            >
+            <label
+              ><input type="checkbox" class="stage3_sel" value="cuan" checked />
+              CUAN</label
+            >
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 12px" class="row">
+        <div class="col">
+          <button class="btn" id="simulate">Simulasikan (Auto)</button>
+        </div>
+        <div class="col right">
+          <div class="small muted">
+            Update input akan otomatis menghitung jika tombol
+            <b>Simulasikan</b> ditekan.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" id="results">
+      <h3>Hasil Simulasi</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Saham</th>
+            <th>Harga</th>
+            <th>Stage1 (1 lot)</th>
+            <th>Stage2 target price</th>
+            <th>Stage2 lots</th>
+            <th>Stage3 lots</th>
+            <th>Total lots</th>
+            <th>Avg Price (Rp)</th>
+            <th>Invested (Rp)</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+
+      <table style="margin-top: 12px">
+        <tr>
+          <th>Total modal awal</th>
+          <td id="r_modal"></td>
+        </tr>
+        <tr>
+          <th>Modal terpakai Stage1</th>
+          <td id="r_stage1"></td>
+        </tr>
+        <tr>
+          <th>Modal tersisa</th>
+          <td id="r_remain"></td>
+        </tr>
+        <tr>
+          <th>Alokasi Stage2 (Rp)</th>
+          <td id="r_stage2alloc"></td>
+        </tr>
+        <tr>
+          <th>Modal terpakai Stage2</th>
+          <td id="r_stage2used"></td>
+        </tr>
+        <tr>
+          <th>Alokasi Stage3 (Rp)</th>
+          <td id="r_stage3alloc"></td>
+        </tr>
+        <tr>
+          <th>Modal terpakai Stage3</th>
+          <td id="r_stage3used"></td>
+        </tr>
+        <tr>
+          <th>Modal akhir tersisa</th>
+          <td id="r_final"></td>
+        </tr>
+      </table>
+    </div>
+
+    <script>
+      function fmt(n){return n===null?'-':n.toLocaleString('id-ID')}
+      function calc(){
+        const modal = Number(document.getElementById('modal').value)||0;
+        const lotSize = Number(document.getElementById('lotSize').value)||100;
+        const p = {
+          cdia: Number(document.getElementById('price_cdia').value)||0,
+          bren: Number(document.getElementById('price_bren').value)||0,
+          ptro: Number(document.getElementById('price_ptro').value)||0,
+          cuan: Number(document.getElementById('price_cuan').value)||0,
+        };
+        const stage2_drop = Number(document.getElementById('stage2_drop').value)||5;
+        const stage2_alloc_pct = Number(document.getElementById('stage2_alloc_pct').value)||20;
+        const stage3_alloc_pct = Number(document.getElementById('stage3_alloc_pct').value)||40;
+        const sel = Array.from(document.querySelectorAll('.stage3_sel:checked')).map(i=>i.value);
+
+        // Stage1: 1 lot each
+        const stage1 = {
+          cdia: {lots:1, price:p.cdia},
+          bren: {lots:1, price:p.bren},
+          ptro: {lots:1, price:p.ptro},
+          cuan: {lots:1, price:p.cuan},
+        };
+        function cost(lots, price){return lots*lotSize*price}
+        const cost_stage1 = cost(stage1.cdia.lots,stage1.cdia.price)
+                          + cost(stage1.bren.lots,stage1.bren.price)
+                          + cost(stage1.ptro.lots,stage1.ptro.price)
+                          + cost(stage1.cuan.lots,stage1.cuan.price);
+
+        const remain_after_s1 = modal - cost_stage1;
+
+        // Stage2 allocation (of remaining modal)
+        const stage2_alloc = Math.floor(remain_after_s1 * (stage2_alloc_pct/100));
+        // divide equally among 4
+        const per_stock_stage2 = Math.floor(stage2_alloc/4);
+
+        // for each stock compute target price
+        const target = {
+          cdia: p.cdia*(1 - stage2_drop/100),
+          bren: p.bren*(1 - stage2_drop/100),
+          ptro: p.ptro*(1 - stage2_drop/100),
+          cuan: p.cuan*(1 - stage2_drop/100),
+        };
+        // compute purchasable lots at target price using per_stock_stage2
+        const stage2 = {};
+        ['cdia','bren','ptro','cuan'].forEach(k=>{
+          const lots = Math.floor(per_stock_stage2 / (lotSize * Math.max(1,target[k])));
+          stage2[k]={lots:lots, price: Math.max(1, Math.round(target[k]))};
+        });
+        const cost_stage2_actual = stage2.cdia.lots*lotSize*stage2.cdia.price
+                                 + stage2.bren.lots*lotSize*stage2.bren.price
+                                 + stage2.ptro.lots*lotSize*stage2.ptro.price
+                                 + stage2.cuan.lots*lotSize*stage2.cuan.price;
+
+        // Stage3 allocation (of initial modal)
+        const stage3_alloc = Math.floor(modal * (stage3_alloc_pct/100));
+        // split equally among selected
+        const selCount = Math.max(1, sel.length);
+        const per_sel = Math.floor(stage3_alloc / selCount);
+        const stage3 = {};
+        ['cdia','bren','ptro','cuan'].forEach(k=>{
+          if(sel.includes(k)){
+            const lots = Math.floor(per_sel / (lotSize * Math.max(1,p[k])));
+            stage3[k]={lots:lots, price: Math.max(1, Math.round(p[k]))};
+          } else {
+            stage3[k]={lots:0, price:0};
+          }
+        });
+        const cost_stage3_actual = stage3.cdia.lots*lotSize*stage3.cdia.price
+                                 + stage3.bren.lots*lotSize*stage3.bren.price
+                                 + stage3.ptro.lots*lotSize*stage3.ptro.price
+                                 + stage3.cuan.lots*lotSize*stage3.cuan.price;
+
+        const final_remain = modal - cost_stage1 - cost_stage2_actual - cost_stage3_actual;
+
+        // build table rows
+        const tbody = document.getElementById('tbody'); tbody.innerHTML='';
+        ['cdia','bren','ptro','cuan'].forEach(k=>{
+          const s1lots = stage1[k].lots;
+          const s2lots = stage2[k].lots;
+          const s3lots = stage3[k].lots;
+          const totalLots = s1lots + s2lots + s3lots;
+          const invested = cost(s1lots, p[k]) + cost(s2lots, stage2[k].price) + cost(s3lots, stage3[k].price);
+          const avgPrice = totalLots>0 ? Math.round(invested / (totalLots*lotSize)) : 0;
+          const row = document.createElement('tr');
+          row.innerHTML =
+            <td>${k.toUpperCase()}</td>
+            <td>${fmt(p[k])}</td>
+            <td>${s1lots} lot</td>
+            <td>${Math.round(target[k])}</td>
+            <td>${s2lots} lot</td>
+            <td>${s3lots} lot</td>
+            <td>${totalLots} lot</td>
+            <td>${avgPrice?fmt(avgPrice):'-'}</td>
+            <td>${fmt(invested)}</td>
+          ;
+          tbody.appendChild(row);
+        });
+
+        document.getElementById('r_modal').innerText = fmt(modal);
+        document.getElementById('r_stage1').innerText = fmt(cost_stage1);
+        document.getElementById('r_remain').innerText = fmt(remain_after_s1);
+        document.getElementById('r_stage2alloc').innerText = fmt(stage2_alloc);
+        document.getElementById('r_stage2used').innerText = fmt(cost_stage2_actual);
+        document.getElementById('r_stage3alloc').innerText = fmt(stage3_alloc);
+        document.getElementById('r_stage3used').innerText = fmt(cost_stage3_actual);
+        document.getElementById('r_final').innerText = fmt(final_remain);
+      }
+
+      document.getElementById('simulate').addEventListener('click', calc);
+      // auto-calc on input change after small debounce
+      let t;
+      document.querySelectorAll('input').forEach(i=>i.addEventListener('input',()=>{clearTimeout(t);t=setTimeout(calc,400)}));
+      window.addEventListener('load',calc);
+    </script>
+  </body>
+</html>
