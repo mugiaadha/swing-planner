@@ -4,141 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Trader Plan Generator — DCA / Cicil Multi-Saham</title>
-    <style>
-      :root {
-        --bg: #f6f8fb;
-        --card: #fff;
-        --muted: #6b7280;
-        --accent: #2563eb;
-      }
-      body {
-        font-family: Inter, ui-sans-serif, system-ui, Segoe UI, Roboto,
-          Helvetica, Arial;
-        background: var(--bg);
-        margin: 0;
-        padding: 24px;
-        color: #0f172a;
-      }
-      .container {
-        max-width: 1100px;
-        margin: 0 auto;
-      }
-      h1 {
-        font-size: 20px;
-        margin: 0 0 12px;
-      }
-      .card {
-        background: var(--card);
-        padding: 16px;
-        border-radius: 12px;
-        box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
-        margin-bottom: 14px;
-      }
-      label {
-        display: block;
-        font-size: 13px;
-        color: var(--muted);
-        margin-bottom: 6px;
-      }
-      input[type="text"],
-      input[type="number"],
-      select {
-        padding: 8px;
-        border: 1px solid #e6eef7;
-        border-radius: 8px;
-        width: 100%;
-        box-sizing: border-box;
-      }
-      .row {
-        display: flex;
-        gap: 12px;
-        margin-bottom: 10px;
-      }
-      .col {
-        flex: 1;
-      }
-      button.btn {
-        background: var(--accent);
-        color: #fff;
-        padding: 8px 12px;
-        border-radius: 8px;
-        border: none;
-        cursor: pointer;
-      }
-      table {
-        width: 100%;
-        border-collapse: collapse;
-        margin-top: 12px;
-      }
-      th,
-      td {
-        padding: 8px;
-        border-bottom: 1px solid #eef2f7;
-        text-align: left;
-        font-size: 13px;
-      }
-      th {
-        background: #fbfdff;
-      }
-      .small {
-        font-size: 12px;
-        color: var(--muted);
-      }
-      .muted {
-        color: var(--muted);
-      }
-      .flex {
-        display: flex;
-        gap: 8px;
-        align-items: center;
-      }
-      .chip {
-        background: #eef2ff;
-        padding: 6px 8px;
-        border-radius: 999px;
-        font-size: 12px;
-        color: var(--accent);
-      }
-      .right {
-        text-align: right;
-      }
-      .num {
-        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
-      }
-      .controls {
-        display: flex;
-        gap: 10px;
-        flex-wrap: wrap;
-      }
-      .stock-row {
-        display: flex;
-        gap: 8px;
-        margin-bottom: 8px;
-        align-items: center;
-      }
-      .stock-row input {
-        width: 120px;
-      }
-      .danger {
-        background: #fee2e2;
-        color: #b91c1c;
-        border-radius: 8px;
-        padding: 6px 8px;
-        border: none;
-      }
-      .success {
-        background: #ecfccb;
-        color: #365314;
-        border-radius: 8px;
-        padding: 6px 8px;
-        border: none;
-      }
-      footer.small {
-        color: var(--muted);
-        margin-top: 12px;
-        font-size: 12px;
-      }
-    </style>
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <div class="container">
@@ -190,10 +56,10 @@
           <div style="width: 220px">
             <label>Simpan plan di browser selama...</label>
             <select id="saveDays">
-              <option value="0">Jangan simpan</option>
+              <option value="0" selected>Jangan simpan</option>
               <option value="1">1 hari</option>
               <option value="3">3 hari</option>
-              <option value="7" selected>7 hari</option>
+              <option value="7">7 hari</option>
               <option value="30">30 hari</option>
             </select>
           </div>
@@ -207,528 +73,64 @@
 
       <div class="card">
         <div
-          style="
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 8px;
-          "
+          style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;"
         >
           <div>
             <strong>Daftar Saham</strong>
-            <div class="small muted">
-              Tambah, edit harga, dan bobot jika perlu.
-            </div>
+            <div class="small muted">Tambah, edit harga, dan bobot jika perlu.</div>
           </div>
           <div class="flex">
             <button class="btn" id="btnAddStock">+ Tambah Saham</button>
             <button id="btnReset" class="danger">Reset</button>
           </div>
         </div>
+        <table style="width:100%;margin-bottom:8px"><thead><tr>
+          <th>Kode</th>
+          <th>Harga Awal</th>
+          <th>Harga per Stage</th>
+          <th>Bobot %</th>
+          <th>Aksi</th>
+        </tr></thead>
+        <tbody id="stocksList"></tbody>
+      </table>
+      <template id="stockTemplate">
+        <tr class="stock-row">
+          <td><input class="s-name" type="text" placeholder="Kode (mis: CDIA)" value="CDIA" /></td>
+          <td><input class="s-price" type="number" placeholder="Harga awal" value="1575" /></td>
+          <td>
+            <span class="stage-prices">
+              <!-- Harga per stage akan diisi oleh JS, label contoh: -->
+              <!-- <span class='stage-label'>Stage 1:</span> <span class='stage-price'>1000</span> -->
+            </span>
+          </td>
+          <td><input class="s-weight" type="number" placeholder="Bobot %" value="0" /></td>
+          <td><button class="btn remove">Hapus</button></td>
+        </tr>
+      </template>
+    </div>
+    
 
-        <div id="stocksList"></div>
-
-        <template id="stockTemplate">
-          <div
-            class="stock-row card"
-            style="padding: 10px; align-items: center"
-          >
-            <input
-              class="s-name"
-              type="text"
-              placeholder="Kode (mis: CDIA)"
-              value="CDIA"
-            />
-            <input
-              class="s-price"
-              type="number"
-              placeholder="Harga per lembar"
-              value="1575"
-            />
-            <input
-              class="s-weight"
-              type="number"
-              placeholder="Bobot %"
-              value="0"
-            />
-            <div class="small muted">Bobot 0 = equal by price</div>
-            <button class="btn remove">Hapus</button>
-          </div>
-        </template>
-      </div>
-
-      <div class="card">
-        <div
-          style="
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-          "
-        >
-          <div>
-            <strong>Hasil Rencana Trader</strong>
-            <div class="small muted">Hitung berdasarkan input di atas.</div>
-          </div>
-          <div class="flex">
-            <button class="btn" id="btnCompute">Generate Plan</button>
-            <button id="btnExport" class="success">Export CSV</button>
-          </div>
+    <div class="card" style="margin-top:24px">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+          <strong>Hasil Rencana Trader</strong>
+          <div class="small muted">Hitung berdasarkan input di atas.</div>
         </div>
-
-        <div id="resultWrap" style="margin-top: 12px"></div>
+        <div class="flex">
+          <button class="btn" id="btnCompute">Generate Plan</button>
+          <button id="btnExport" class="success">Export CSV</button>
+        </div>
       </div>
 
-      <footer class="small">
-        Tip: mulai dengan stage0 kecil (1 lot) untuk test, gunakan
-        buy-on-weakness di tahap berikutnya jika harga turun.
-      </footer>
+      <div id="resultWrap" style="margin-top: 12px"></div>
+      
+      <div class="small">
+          Tip: mulai dengan stage0 kecil (1 lot) untuk test, gunakan
+          buy-on-weakness di tahap berikutnya jika harga turun.
+      </div>
     </div>
 
-    <script>
-      /*
-  Trader Plan Generator
-  - dynamic stock list
-  - stage0 fixed lots per stock
-  - stages (1..N) allocations: equal or custom %
-  - weighting per stock optional (if all zero -> allocation by price proportion)
-  - outputs lots per stage (integer lots), invested per stage, avg price estimate
-  - export CSV
-*/
 
-      // helpers
-      const $ = (id) => document.getElementById(id);
-      const fmt = (v) =>
-        typeof v === "number" ? v.toLocaleString("id-ID") : v;
-
-      function createStockRow(name = "CDIA", price = 1575, weight = 0) {
-        const t = document
-          .getElementById("stockTemplate")
-          .content.cloneNode(true);
-        const el = t.querySelector(".stock-row");
-        el.querySelector(".s-name").value = name;
-        el.querySelector(".s-price").value = price;
-        el.querySelector(".s-weight").value = weight;
-        el.querySelector(".remove").addEventListener("click", () => {
-          el.remove();
-        });
-        document.getElementById("stocksList").appendChild(el);
-      }
-
-      document
-        .getElementById("btnAddStock")
-        .addEventListener("click", () => createStockRow("", "", 0));
-      document.getElementById("btnReset").addEventListener("click", () => {
-        if (!confirm("Reset semua input?")) return;
-        $("stocksList").innerHTML = "";
-        createStockRow("CDIA", 1575, 0);
-        createStockRow("BREN", 8000, 0);
-        createStockRow("PTRO", 3710, 0);
-        createStockRow("CUAN", 1575, 0);
-      });
-
-      // initial
-      createStockRow("CDIA", 1575, 0);
-      createStockRow("BREN", 8000, 0);
-      createStockRow("PTRO", 3710, 0);
-      createStockRow("CUAN", 1575, 0);
-
-      // toggle custom alloc
-      $("allocMode").addEventListener("change", (e) => {
-        $("customAllocWrap").style.display =
-          e.target.value === "custom" ? "block" : "none";
-      });
-
-      // get stocks array
-      function readStocks() {
-        const rows = Array.from(
-          document.querySelectorAll("#stocksList .stock-row")
-        );
-        return rows
-          .map((r) => {
-            return {
-              name: r.querySelector(".s-name").value.trim() || "UNK",
-              price: Number(r.querySelector(".s-price").value) || 0,
-              weight: Number(r.querySelector(".s-weight").value) || 0,
-            };
-          })
-          .filter((s) => s.price > 0);
-      }
-
-      // compute plan
-      function computePlan() {
-        const modal = Number($("inputModal").value) || 0;
-        const lotSize = Number($("inputLotSize").value) || 100;
-        const days = Number($("inputDays").value) || 90;
-        const stages = Math.max(1, Number($("inputStages").value) || 3);
-        const stage0Lots = Math.max(0, Number($("stage0_lot").value) || 1);
-        const allocMode = $("allocMode").value;
-        let customPercents = [];
-
-        if (allocMode === "custom") {
-          const raw = ($("customAlloc").value || "").trim();
-          if (!raw) {
-            alert("Masukkan persen custom untuk tiap tahap (jumlah = 100)");
-            return null;
-          }
-          customPercents = raw.split(",").map((x) => Number(x.trim()) || 0);
-          if (customPercents.length !== stages) {
-            alert(
-              "Jumlah persen custom harus sesuai jumlah tahap yang kamu pilih."
-            );
-            return null;
-          }
-          const sum = customPercents.reduce((a, b) => a + b, 0);
-          if (Math.round(sum) !== 100) {
-            alert(
-              "Total persen custom harus 100%. Saat ini total = " + sum + "%"
-            );
-            return null;
-          }
-        }
-
-        const stocks = readStocks();
-        if (stocks.length === 0) {
-          alert("Tambahkan minimal 1 saham dengan harga > 0");
-          return null;
-        }
-
-        // compute money reserved for stage0
-        let stage0Cost = 0;
-        stocks.forEach((s) => (stage0Cost += stage0Lots * lotSize * s.price));
-
-        if (stage0Cost > modal) {
-          alert(
-            "Modal tidak cukup untuk stage0. Kurangi stage0 lots atau tambah modal."
-          );
-          return null;
-        }
-
-        // remaining modal for stages 1..stages
-        let remaining = modal - stage0Cost;
-
-        // stage allocation in money
-        let stageAllocations = [];
-        if (allocMode === "equal") {
-          // equal share across stages
-          const per = Math.floor(remaining / stages);
-          // to avoid rounding losing money, build allocations that sum <= remaining
-          for (let i = 0; i < stages; i++) stageAllocations.push(per);
-          // add remainder to last stage
-          const rem = remaining - per * stages;
-          if (rem > 0) stageAllocations[stages - 1] += rem;
-        } else {
-          // custom percents -> convert to money
-          stageAllocations = customPercents.map((p) => {
-            return Math.floor((remaining * p) / 100);
-          });
-          // fix remainder
-          const allocated = stageAllocations.reduce((a, b) => a + b, 0);
-          const rem = remaining - allocated;
-          if (rem > 0) stageAllocations[stageAllocations.length - 1] += rem;
-        }
-
-        // decide per-stock allocation within each stage
-        // If user specified weights (some non-zero), we use normalized weights.
-        // Otherwise distribute by price-proportion (inverse?) — we'll use price-proportional so expensive stocks get more money proportionally.
-        let useWeights = stocks.some((s) => s.weight > 0);
-        let totalWeight = useWeights
-          ? stocks.reduce((a, b) => a + (b.weight || 0), 0)
-          : null;
-
-        // fallback: compute price-proportion (price / sum(price))
-        const totalPrice = stocks.reduce((a, b) => a + b.price, 0);
-
-        // For each stage, compute lots per stock (integer lots) using floor of (money * share) / (lotSize*price)
-        const plan = {}; // stockName -> details
-        stocks.forEach((s) => {
-          plan[s.name] = {
-            price: s.price,
-            stage0: stage0Lots,
-            stages: Array.from({ length: stages }, () => 0),
-            investedStage0: stage0Lots * lotSize * s.price,
-          };
-        });
-
-        // For each stage index
-        for (let si = 0; si < stages; si++) {
-          const moneyForStage = stageAllocations[si] || 0;
-          // allocate moneyForStage among stocks according to weights / price proportion
-          // compute each stock money share
-          let shares = stocks.map((s) => {
-            let share = 0;
-            if (useWeights) {
-              if (totalWeight === 0) share = 1 / stocks.length;
-              else share = s.weight / totalWeight;
-            } else {
-              share = s.price / totalPrice; // proportional to price
-            }
-            return share;
-          });
-
-          // now compute tentative lots
-          let stageLots = stocks.map((s, idx) => {
-            const allocatedMoney = Math.floor(moneyForStage * shares[idx]);
-            const lotCost = lotSize * s.price;
-            const lotsCanBuy = Math.floor(allocatedMoney / lotCost);
-            return lotsCanBuy;
-          });
-
-          // It's possible due to floors we didn't use all moneyForStage. Try greedy filling: distribute leftover money to stocks that can accept additional lot
-          let usedMoney = stageLots.reduce(
-            (acc, lots, idx) => acc + lots * lotSize * stocks[idx].price,
-            0
-          );
-          let leftover = moneyForStage - usedMoney;
-          // Greedy: while leftover can buy at least one lot of any stock, buy for cheapest lot first
-          while (true) {
-            // find cheapest lot cost among stocks where leftover >= lotCost
-            let buyIdx = -1;
-            let minCost = Infinity;
-            for (let i = 0; i < stocks.length; i++) {
-              const costLot = lotSize * stocks[i].price;
-              if (costLot <= leftover && costLot < minCost) {
-                minCost = costLot;
-                buyIdx = i;
-              }
-            }
-            if (buyIdx === -1) break;
-            stageLots[buyIdx] += 1;
-            leftover -= minCost;
-          }
-
-          // assign stageLots to plan and accumulate invested
-          stocks.forEach((s, idx) => {
-            plan[s.name].stages[si] = stageLots[idx];
-            plan[s.name].investedStage0 = plan[s.name].investedStage0 || 0;
-            // accumulate invested for stage via later calc
-          });
-        }
-
-        // finalize invested amounts & totals
-        let totals = {
-          investedStage0: 0,
-          investedStages: Array.from({ length: stages }, () => 0),
-          totalInvested: 0,
-        };
-
-        stocks.forEach((s, idx) => {
-          const entry = plan[s.name];
-          const invest0 = entry.stage0 * lotSize * s.price;
-          totals.investedStage0 += invest0;
-          let sumStages = 0;
-          entry.stages.forEach((lots, si) => {
-            const cost = lots * lotSize * s.price;
-            totals.investedStages[si] += cost;
-            sumStages += cost;
-          });
-          entry.totalLots =
-            entry.stage0 + entry.stages.reduce((a, b) => a + b, 0);
-          entry.totalInvested = invest0 + sumStages;
-          entry.avgPricePerShare =
-            entry.totalLots > 0
-              ? Math.round(entry.totalInvested / (entry.totalLots * lotSize))
-              : 0;
-          totals.totalInvested += entry.totalInvested;
-        });
-
-        const leftoverFinal = modal - totals.totalInvested;
-
-        return {
-          plan,
-          stocks,
-          totals,
-          stageAllocations,
-          leftoverFinal,
-          stages,
-          lotSize,
-          modal,
-        };
-      }
-
-      // render result
-      function renderResult(obj) {
-        const wrap = $("resultWrap");
-        if (!obj) {
-          wrap.innerHTML = "";
-          return;
-        }
-        const {
-          plan,
-          stocks,
-          totals,
-          stageAllocations,
-          leftoverFinal,
-          stages,
-          lotSize,
-          modal,
-        } = obj;
-
-        let html = `<div class="card"><div class="small muted">Modal awal: Rp ${fmt(
-          modal
-        )}</div>
-    <table><thead><tr><th>Saham</th><th>Harga</th><th>Stage0 (lot)</th>`;
-        for (let s = 0; s < stages; s++)
-          html += `<th>Stage ${s + 1} (lot)</th>`;
-        html += `<th>Total Lot</th><th>Avg Price/lembar</th><th>Total Invest (Rp)</th></tr></thead><tbody>`;
-
-        for (const s of stocks) {
-          const row = plan[s.name];
-          html += `<tr>
-      <td>${s.name}</td>
-      <td>Rp ${fmt(s.price)}</td>
-      <td>${row.stage0}</td>`;
-          for (let i = 0; i < stages; i++)
-            html += `<td>${row.stages[i] || 0}</td>`;
-          html += `<td>${row.totalLots}</td>
-      <td>Rp ${fmt(row.avgPricePerShare)}</td>
-      <td>Rp ${fmt(row.totalInvested)}</td>
-    </tr>`;
-        }
-
-        html += `</tbody></table>
-    <div style="margin-top:12px"><strong>Ringkasan:</strong>
-      <div class="small">Investasi Stage0: Rp ${fmt(
-        totals.investedStage0
-      )}</div>`;
-
-        stageAllocations.forEach((a, idx) => {
-          html += `<div class="small">Alokasi Stage ${idx + 1}: Rp ${fmt(
-            a
-          )} (terpakai: Rp ${fmt(totals.investedStages[idx] || 0)})</div>`;
-        });
-
-        html += `<div class="small">Total invested: Rp ${fmt(
-          totals.totalInvested
-        )}</div>
-           <div class="small">Sisa modal (final): Rp ${fmt(leftoverFinal)}</div>
-           </div>
-    </div>`;
-
-        wrap.innerHTML = html;
-      }
-
-      // CSV export
-      function exportCSV(obj) {
-        if (!obj) return;
-        const {
-          plan,
-          stocks,
-          totals,
-          stageAllocations,
-          leftoverFinal,
-          stages,
-          lotSize,
-        } = obj;
-        let rows = [];
-        let header = ["Saham", "Harga", "Stage0(lot)"];
-        for (let i = 0; i < stages; i++) header.push(`Stage${i + 1}(lot)`);
-        header.push("TotalLot", "AvgPricePerShare", "TotalInvested");
-        rows.push(header.join(","));
-
-        stocks.forEach((s) => {
-          const p = plan[s.name];
-          const row = [s.name, s.price, p.stage0];
-          for (let i = 0; i < stages; i++) row.push(p.stages[i] || 0);
-          row.push(p.totalLots, p.avgPricePerShare, p.totalInvested);
-          rows.push(row.join(","));
-        });
-
-        rows.push("");
-        rows.push(`Summary,Modal awal,${$("inputModal").value}`);
-        rows.push(`Invested Stage0,${totals.investedStage0}`);
-        stageAllocations.forEach((a, idx) =>
-          rows.push(
-            `Allocated Stage ${idx + 1},${a},Used ${
-              totals.investedStages[idx] || 0
-            }`
-          )
-        );
-        rows.push(`Total Invested,${totals.totalInvested}`);
-        rows.push(`Leftover,${leftoverFinal}`);
-
-        const csv = rows.join("\n");
-        const blob = new Blob([csv], { type: "text/csv" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "trader_plan.csv";
-        a.click();
-        URL.revokeObjectURL(url);
-      }
-
-      // event handlers
-      $("btnCompute").addEventListener("click", () => {
-        const res = computePlan();
-        if (res) {
-          renderResult(res);
-          // save to localStorage if needed
-          const saveDays = Number($("saveDays").value) || 0;
-          if (saveDays > 0) {
-            const data = {
-              modal: $("inputModal").value,
-              lotSize: $("inputLotSize").value,
-              days: $("inputDays").value,
-              stages: $("inputStages").value,
-              stage0: $("stage0_lot").value,
-              allocMode: $("allocMode").value,
-              customAlloc: $("customAlloc").value,
-              stocks: readStocks(),
-              ts: Date.now(),
-              exp: Date.now() + saveDays * 24 * 60 * 60 * 1000,
-            };
-            localStorage.setItem("traderPlan", JSON.stringify(data));
-          } else {
-            localStorage.removeItem("traderPlan");
-          }
-        }
-      });
-
-      $("btnExport").addEventListener("click", () => {
-        const res = computePlan();
-        if (res) exportCSV(res);
-      });
-
-      // allow pressing Enter in customAlloc
-      $("customAlloc").addEventListener("keydown", (e) => {
-        if (e.key === "Enter") $("btnCompute").click();
-      });
-
-      // on load, try to restore plan
-      window.addEventListener("DOMContentLoaded", () => {
-        const raw = localStorage.getItem("traderPlan");
-        if (raw) {
-          try {
-            const data = JSON.parse(raw);
-            if (data.exp && Date.now() < data.exp) {
-              $("inputModal").value = data.modal || 60000000;
-              $("inputLotSize").value = data.lotSize || 100;
-              $("inputDays").value = data.days || 90;
-              $("inputStages").value = data.stages || 3;
-              $("stage0_lot").value = data.stage0 || 1;
-              $("allocMode").value = data.allocMode || "equal";
-              $("customAlloc").value = data.customAlloc || "";
-              // restore stocks
-              $("stocksList").innerHTML = "";
-              (data.stocks || []).forEach((s) =>
-                createStockRow(s.name, s.price, s.weight)
-              );
-              // show/hide custom alloc
-              $("customAllocWrap").style.display =
-                data.allocMode === "custom" ? "block" : "none";
-              // set saveDays to match remaining days
-              const left = Math.ceil(
-                (data.exp - Date.now()) / (24 * 60 * 60 * 1000)
-              );
-              $("saveDays").value = left > 0 ? left : 7;
-              // auto-compute
-              const res = computePlan();
-              if (res) renderResult(res);
-            } else {
-              localStorage.removeItem("traderPlan");
-            }
-          } catch {}
-        }
-      });
-    </script>
+    <script src="main.js"></script>
   </body>
 </html>

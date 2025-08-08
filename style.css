@@ -1,0 +1,162 @@
+body {
+  font-family: Inter, ui-sans-serif, system-ui, Segoe UI, Roboto, Helvetica, Arial;
+  background: var(--bg);
+  margin: 0;
+  padding: 24px;
+  color: #0f172a;
+}
+:root {
+  --bg: #f6f8fb;
+  --card: #fff;
+  --muted: #6b7280;
+  --accent: #2563eb;
+}
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+h1 {
+  font-size: 20px;
+  margin: 0 0 12px;
+}
+.card {
+  background: var(--card);
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+  margin-bottom: 14px;
+}
+label {
+  display: block;
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+input[type="text"],
+input[type="number"],
+select {
+  padding: 8px;
+  border: 1px solid #e6eef7;
+  border-radius: 8px;
+  width: 100%;
+  box-sizing: border-box;
+}
+.row {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.col {
+  flex: 1;
+}
+button.btn {
+  background: var(--accent);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+}
+th,
+td {
+  padding: 8px;
+  border-bottom: 1px solid #eef2f7;
+  text-align: left;
+  font-size: 13px;
+}
+th {
+  background: #fbfdff;
+}
+.small {
+  font-size: 12px;
+  color: var(--muted);
+}
+.muted {
+  color: var(--muted);
+}
+.flex {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.chip {
+  background: #eef2ff;
+  padding: 6px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  color: var(--accent);
+}
+.right {
+  text-align: right;
+}
+.num {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+}
+.controls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.stock-row { }
+.stock-row input { }
+.danger {
+  background: #fee2e2;
+  color: #b91c1c;
+  border-radius: 8px;
+  padding: 6px 8px;
+  border: none;
+}
+.success {
+  background: #ecfccb;
+  color: #365314;
+  border-radius: 8px;
+  padding: 6px 8px;
+  border: none;
+}
+footer.small {
+  color: var(--muted);
+  margin-top: 12px;
+  font-size: 12px;
+}
+#stocksList input[type="text"],
+#stocksList input[type="number"] {
+  width: 80px;
+  min-width: 60px;
+  max-width: 100px;
+  padding: 4px 6px;
+  font-size: 13px;
+  margin: 0;
+  box-sizing: border-box;
+  text-align: center;
+}
+#stocksList .stage-prices input {
+  width: 60px;
+  min-width: 50px;
+  max-width: 80px;
+  margin: 0 2px;
+  padding: 4px 4px;
+  font-size: 12px;
+  text-align: center;
+}
+#stocksList td,
+#stocksList th {
+  text-align: center;
+  vertical-align: middle;
+  padding: 4px 6px;
+}
+#stocksList .btn.remove {
+  padding: 4px 8px;
+  font-size: 12px;
+  border-radius: 6px;
+}
+#stocksList tr.stock-row {
+  background: #f9fafb;
+}
+#stocksList tr.stock-row:nth-child(even) {
+  background: #f3f4f6;
+}
